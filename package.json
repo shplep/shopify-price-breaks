@@ -1,0 +1,21 @@
+{
+  "name": "shopify-price-breaks",
+  "version": "1.0.0",
+  "description": "A Shopify cart transform function that applies quantity-based price breaks to products",
+  "main": "extensions/cart-updater-js/src/run.js",
+  "scripts": {
+    "build": "shopify app build",
+    "deploy": "shopify app deploy",
+    "dev": "shopify app dev"
+  },
+  "dependencies": {
+    "@shopify/shopify-api": "^7.0.0",
+    "@shopify/shopify-app-express": "^2.0.0"
+  },
+  "devDependencies": {
+    "@shopify/app": "^3.0.0",
+    "@shopify/cli": "^3.0.0"
+  },
+  "author": "",
+  "license": "MIT"
+}
