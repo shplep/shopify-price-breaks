@@ -35,12 +35,51 @@ export function run(input) {
           continue;
         }
         
-        if (!merchandise.product?.metafield?.value) {
-          console.log("❌ No price breaks metafield found");
+        // Get the metafields from the product
+        const priceBreaksMetafield = merchandise.product?.metafields?.find(m => 
+          m.namespace === "custom" && m.key === "pricebreaks"
+        );
+        
+        const zakekePriceMetafield = merchandise.product?.metafields?.find(m => 
+          m.namespace === "zakeke" && m.key === "price"
+        );
+        
+        // Parse zakeke price if available
+        let zakekePrice = 0;
+        if (zakekePriceMetafield?.value) {
+          try {
+            zakekePrice = parseFloat(zakekePriceMetafield.value);
+            console.log(`💰 Zakeke price addition: ${zakekePrice}`);
+          } catch (error) {
+            console.log(`⚠️ Error parsing zakeke price: ${error.message}`);
+            zakekePrice = 0;
+          }
+        }
+        
+        // Continue with price breaks logic
+        if (!priceBreaksMetafield?.value) {
+          // If we only have zakeke price, apply it directly
+          if (zakekePrice > 0) {
+            console.log(`✅ Applying only zakeke price: ${zakekePrice}`);
+            operations.push({
+              update: {
+                cartLineId: line.id,
+                price: {
+                  adjustment: {
+                    fixedPricePerUnit: {
+                      amount: zakekePrice.toString()
+                    }
+                  }
+                }
+              }
+            });
+          } else {
+            console.log("❌ No price breaks or zakeke price found");
+          }
           continue;
         }
         
-        const metafieldValue = merchandise.product.metafield.value;
+        const metafieldValue = priceBreaksMetafield.value;
         let parsedData, basePrice, quantityBreaks;
         
         try {
@@ -81,18 +120,23 @@ export function run(input) {
           continue;
         }
         
-        const newPrice = getPriceForQuantity(basePrice, quantityBreaks, quantity);
-        console.log(`💵 Calculated price: ${newPrice}`);
+        // Calculate price with quantity breaks
+        const priceWithBreaks = getPriceForQuantity(basePrice, quantityBreaks, quantity);
         
-        if (newPrice !== basePrice) {
-          console.log(`✅ PRICE CHANGE: ${basePrice} → ${newPrice}`);
+        // Add zakeke price to the final price
+        const finalPrice = priceWithBreaks + zakekePrice;
+        console.log(`💵 Final price calculation: ${priceWithBreaks} + ${zakekePrice} = ${finalPrice}`);
+        
+        // Only add operation if price is different from base
+        if (finalPrice !== basePrice) {
+          console.log(`✅ PRICE CHANGE: ${basePrice} → ${finalPrice}`);
           operations.push({
             update: {
               cartLineId: line.id,
               price: {
                 adjustment: {
                   fixedPricePerUnit: {
-                    amount: newPrice.toString()
+                    amount: finalPrice.toString()
                   }
                 }
               }
