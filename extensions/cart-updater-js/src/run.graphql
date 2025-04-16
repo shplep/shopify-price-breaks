@@ -1,0 +1,20 @@
+query Input {
+  cart {
+    lines {
+      id
+      quantity
+      merchandise {
+        __typename
+        ... on ProductVariant {
+          id
+          sku
+          product {
+            metafield(namespace: "custom", key: "pricebreaks") {
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+}
