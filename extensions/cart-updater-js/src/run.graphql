@@ -12,6 +12,9 @@ query Input {
             metafield(namespace: "custom", key: "pricebreaks") {
               value
             }
+            metafield(namespace: "zakeke", key: "price") {
+              value
+            }
           }
         }
       }
