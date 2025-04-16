@@ -1,0 +1,21 @@
+api_version = "2025-01"
+
+name = "cart-updater-js"
+type = "function"
+
+extension_points = [
+  'purchase.cart-transform.run'
+]
+
+handle = "zakeke-price-breaks-3"
+
+metafields = [
+  { namespace = "custom", key = "pricebreaks" }
+]
+
+[build]
+command = "npm run build"
+path = "dist/function.wasm"
+
+[api]
+input_query = "Input"
